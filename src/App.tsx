@@ -3,7 +3,7 @@ import Navbar from './components/layout/Navbar';
 import Hero from './components/landing/Hero';
 import Features from './components/landing/Features';
 import Footer from './components/landing/Footer';
-import Dashboard from './components/dashboard/Dashboard';
+import ProfessionalDashboard from './components/dashboard/ProfessionalDashboard';
 import LoginModal from './components/auth/LoginModal';
 import Pricing from './pages/Pricing';
 import FeaturesPage from './pages/FeaturesPage';
@@ -39,7 +39,7 @@ function App() {
           </main>
         );
       case 'dashboard':
-        return <Dashboard isUserLoggedIn={isUserLoggedIn} />;
+        return <ProfessionalDashboard isUserLoggedIn={isUserLoggedIn} onRequestLogin={() => setIsAuthModalOpen(true)} />;
       case 'features':
         return <FeaturesPage />;
       case 'pricing':

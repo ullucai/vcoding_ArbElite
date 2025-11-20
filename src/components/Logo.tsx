@@ -1,82 +1,85 @@
 export default function Logo() {
   return (
     <div className="flex items-center gap-3 group cursor-pointer">
-      <div className="relative w-11 h-11 flex items-center justify-center">
-        {/* Animated outer glow ring */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-600/5 blur-md group-hover:from-orange-500/30 group-hover:to-orange-600/10 transition-all duration-300" />
+      {/* Hexagonal Elite Badge */}
+      <div className="relative w-12 h-12 flex items-center justify-center">
+        {/* Animated outer pulse */}
+        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-orange-500/30 to-orange-600/10 blur-xl group-hover:from-orange-500/40 group-hover:to-orange-600/20 transition-all duration-500 animate-pulse" />
 
-        {/* Target rings with refined styling */}
-        <svg viewBox="0 0 100 100" className="w-full h-full fill-none relative z-10">
-          <circle
-            cx="50"
-            cy="50"
-            r="44"
-            stroke="white"
-            strokeWidth="3"
-            opacity="0.95"
-            className="group-hover:stroke-orange-400 transition-all duration-300"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r="32"
-            stroke="white"
-            strokeWidth="2.5"
-            opacity="0.6"
-            className="group-hover:stroke-orange-400 transition-all duration-300"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r="20"
-            stroke="white"
-            strokeWidth="2"
-            opacity="0.3"
-            className="group-hover:stroke-orange-400 transition-all duration-300"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r="8"
-            fill="#ea580c"
-            opacity="0.8"
-            className="group-hover:opacity-100 transition-opacity duration-300"
-          />
-        </svg>
+        {/* Main hexagon container */}
+        <div className="relative z-10 w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            {/* Outer hexagon border */}
+            <defs>
+              <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ea580c" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#f97316" stopOpacity="0.4" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
 
-        {/* Precision dart with sharper angle */}
-        <div className="absolute inset-0 flex items-center justify-center z-20">
-          <svg width="22" height="22" viewBox="0 0 24 24" className="transform rotate-[-15deg] translate-x-1.5 -translate-y-1.5 drop-shadow-[0_0_12px_rgba(234,88,12,1)] group-hover:drop-shadow-[0_0_16px_rgba(234,88,12,1)] transition-all duration-300">
-            {/* Dart trajectory line */}
-            <line
-              x1="22"
-              y1="2"
-              x2="11"
-              y2="13"
-              stroke="#ea580c"
-              strokeWidth="3"
-              strokeLinecap="round"
-              opacity="0.9"
-            />
-            {/* Dart body - sharper and more refined */}
+            {/* Hexagon shape */}
             <path
-              d="M22 2L15 22L11 13L2 9L22 2Z"
-              fill="#ea580c"
+              d="M50 5 L85 27.5 L85 72.5 L50 95 L15 72.5 L15 27.5 Z"
+              fill="url(#hexGrad)"
+              stroke="white"
+              strokeWidth="2"
+              opacity="0.9"
+              className="group-hover:opacity-100 transition-all duration-300"
+              filter="url(#glow)"
             />
-            {/* Dart tip highlight */}
+
+            {/* Inner geometric pattern */}
+            <path
+              d="M50 20 L70 35 L70 65 L50 80 L30 65 L30 35 Z"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.5"
+              opacity="0.4"
+              className="group-hover:stroke-orange-300 transition-all duration-300"
+            />
+
+            {/* Center diamond */}
+            <path
+              d="M50 35 L60 50 L50 65 L40 50 Z"
+              fill="white"
+              opacity="0.9"
+              className="group-hover:fill-orange-300 transition-all duration-300"
+            />
+
+            {/* Elite star accent */}
             <circle
-              cx="22"
-              cy="2"
-              r="1.5"
-              fill="#ff6b35"
-              className="group-hover:r-2 transition-all duration-300"
+              cx="50"
+              cy="50"
+              r="3"
+              fill="#fff"
+              className="animate-pulse"
             />
           </svg>
         </div>
+
+        {/* Floating particles effect */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="absolute top-0 right-0 w-1 h-1 bg-orange-400 rounded-full animate-ping" style={{ animationDelay: '0ms' }} />
+          <div className="absolute bottom-0 left-0 w-1 h-1 bg-orange-500 rounded-full animate-ping" style={{ animationDelay: '200ms' }} />
+        </div>
       </div>
-      <span className="text-xl font-black tracking-tight text-white font-sans select-none">
-        Arb<span className="text-[#ea580c] group-hover:text-orange-400 transition-colors duration-300">Elite</span>
-      </span>
+
+      {/* Elite text branding */}
+      <div className="flex flex-col">
+        <span className="text-2xl font-black tracking-tighter leading-none text-white font-sans select-none">
+          ARB<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600 group-hover:from-orange-400 group-hover:to-orange-500 transition-all duration-300">ELITE</span>
+        </span>
+        <span className="text-[0.5rem] font-bold tracking-[0.15em] text-orange-500/60 uppercase mt-0.5">
+          Precision Trading
+        </span>
+      </div>
     </div>
   );
 }
