@@ -3,13 +3,14 @@ import Navbar from './components/layout/Navbar';
 import Hero from './components/landing/Hero';
 import Features from './components/landing/Features';
 import Footer from './components/landing/Footer';
-import ProfessionalDashboard from './components/dashboard/ProfessionalDashboard';
+import DashboardContainer from './pages/DashboardContainer';
 import LoginModal from './components/auth/LoginModal';
 import Pricing from './pages/Pricing';
 import FeaturesPage from './pages/FeaturesPage';
 import AboutPage from './pages/AboutPage';
 
 type Page = 'home' | 'dashboard' | 'features' | 'pricing' | 'about' | 'terms' | 'privacy' | 'help' | 'contact' | 'disclaimer';
+type UserTier = 'free' | 'pro' | 'admin';
 
 const InfoPage = ({ title, content }: { title: string, content: string }) => (
   <div className="min-h-screen bg-[#0a0a0a] text-white pt-32 pb-20 px-8 max-w-4xl mx-auto">
@@ -27,6 +28,8 @@ function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const [userTier, setUserTier] = useState<UserTier>('free');
+  const [username, setUsername] = useState('');
 
   const renderPage = () => {
     switch (currentPage) {
@@ -39,7 +42,17 @@ function App() {
           </main>
         );
       case 'dashboard':
-        return <ProfessionalDashboard isUserLoggedIn={isUserLoggedIn} onRequestLogin={() => setIsAuthModalOpen(true)} />;
+        if (!isUserLoggedIn) {
+          setIsAuthModalOpen(true);
+          setCurrentPage('home');
+          return null;
+        }
+        return <DashboardContainer userTier={userTier} onLogout={() => {
+          setIsUserLoggedIn(false);
+          setUserTier('free');
+          setUsername('');
+          setCurrentPage('home');
+        }} />;
       case 'features':
         return <FeaturesPage />;
       case 'pricing':
@@ -63,14 +76,19 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-orange-500/30">
-      <Navbar onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={setCurrentPage} />
+      {currentPage !== 'dashboard' && (
+        <Navbar onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={setCurrentPage} />
+      )}
       {renderPage()}
       <LoginModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        onLoginSuccess={() => {
+        onLoginSuccess={(tier, user) => {
           setIsUserLoggedIn(true);
+          setUserTier(tier);
+          setUsername(user);
           setIsAuthModalOpen(false);
+          setCurrentPage('dashboard');
         }}
       />
     </div>

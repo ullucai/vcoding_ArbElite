@@ -4,7 +4,7 @@ import { X, Mail, Lock, User } from 'lucide-react';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess: () => void;
+  onLoginSuccess: (tier: 'free' | 'pro' | 'admin', username: string) => void;
 }
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
@@ -37,10 +37,14 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
         <form className="space-y-4" onSubmit={(e) => {
           e.preventDefault();
           setError('');
-          if (email === 'admin' && password === 'admin') {
-            onLoginSuccess();
+          if (email === 'admin' && password === 'admin123') {
+            onLoginSuccess('admin', email);
+            onClose();
+          } else if (email === 'fadmin' && password === 'fadmin') {
+            onLoginSuccess('free', email);
+            onClose();
           } else {
-            setError('Invalid credentials. Try admin/admin for demo.');
+            setError('Invalid credentials. Try fadmin/fadmin (Free) or admin/admin123 (Full Access)');
           }
         }}>
           {isSignUp && (
