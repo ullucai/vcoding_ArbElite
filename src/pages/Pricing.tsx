@@ -1,5 +1,4 @@
 import { Check, Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export default function Pricing() {
   const tiers = [
@@ -55,40 +54,22 @@ export default function Pricing() {
     <div className="min-h-screen bg-[#0a0a0a] pt-32 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full text-sm font-semibold text-orange-400 mb-4"
-          >
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full text-sm font-semibold text-orange-400 mb-4">
             <Zap size={16} />
             Simple, Transparent Pricing
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl md:text-6xl font-bold text-white mb-6"
-          >
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
             Choose Your Edge
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-gray-400 max-w-2xl mx-auto"
-          >
+          </h1>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Start free, upgrade when you're ready. No hidden fees, cancel anytime.
-          </motion.p>
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {tiers.map((tier, index) => (
-            <motion.div
+            <div
               key={tier.name}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 + 0.3 }}
-              whileHover={{ y: -8 }}
               className={`relative rounded-2xl p-8 ${
                 tier.highlighted
                   ? 'bg-gradient-to-b from-orange-500/10 to-transparent border-2 border-orange-500/50 shadow-2xl shadow-orange-500/20'
@@ -141,20 +122,15 @@ export default function Pricing() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center mt-16"
-        >
+        <div className="text-center mt-16">
           <p className="text-gray-400 text-sm">
             All plans include bank-grade encryption and 24/7 monitoring.
           </p>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

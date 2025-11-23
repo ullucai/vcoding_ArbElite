@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Target, Users, Zap, TrendingUp } from 'lucide-react';
 
 export default function AboutPage() {
@@ -13,12 +12,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-[#0a0a0a] pt-32 pb-20 px-4">
       <div className="max-w-4xl mx-auto">
 
-        {/* Hero Hook */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-20"
-        >
+        <div className="text-center mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full text-sm font-semibold text-orange-400 mb-6">
             <Target size={16} />
             Our Story
@@ -33,15 +27,9 @@ export default function AboutPage() {
             We're a team of ex-quants and mathematicians who got tired of seeing bookmakers
             rake in billions from retail bettors. So we built the weapon that levels the playing field.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Mission Statement */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-10 mb-16"
-        >
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-10 mb-16">
           <h2 className="text-2xl font-bold text-white mb-4">Our Mission</h2>
           <p className="text-gray-400 text-lg leading-relaxed mb-6">
             ArbElite exists to democratize arbitrage betting. What was once only accessible to
@@ -51,15 +39,9 @@ export default function AboutPage() {
             We believe in data-driven investing, not gambling. Every bet placed through our platform
             is mathematically guaranteed to profit, regardless of the game outcome.
           </p>
-        </motion.div>
+        </div>
 
-        {/* The Team */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-16"
-        >
+        <div className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Built by Experts</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
@@ -90,24 +72,13 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Timeline */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
+        <div>
           <h2 className="text-3xl font-bold text-white mb-8">The Evolution of Betting</h2>
           <div className="space-y-6">
             {timeline.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                className="flex gap-6 items-start"
-              >
+              <div key={index} className="flex gap-6 items-start">
                 <div className="flex-shrink-0">
                   <div className={`w-20 h-20 rounded-full flex items-center justify-center text-sm font-bold ${
                     index === timeline.length - 1
@@ -121,18 +92,12 @@ export default function AboutPage() {
                   <h3 className="text-xl font-bold text-white mb-2">{item.event}</h3>
                   <p className="text-gray-400">{item.description}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-20 bg-gradient-to-br from-[#171717] to-[#0a0a0a] border border-white/10 rounded-2xl p-10"
-        >
+        <div className="mt-20 bg-gradient-to-br from-[#171717] to-[#0a0a0a] border border-white/10 rounded-2xl p-10">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
               <div className="text-4xl font-bold text-orange-500 mb-2">1,200+</div>
@@ -147,7 +112,7 @@ export default function AboutPage() {
               <div className="text-gray-400">Average ROI per Bet</div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
       </div>
     </div>

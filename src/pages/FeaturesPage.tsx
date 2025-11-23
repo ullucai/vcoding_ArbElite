@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Zap, Shield, PieChart, Target, TrendingUp, Clock } from 'lucide-react';
 
 export default function FeaturesPage() {
@@ -81,78 +80,48 @@ export default function FeaturesPage() {
     <div className="min-h-screen bg-[#0a0a0a] pt-32 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
 
-        {/* Hero */}
         <div className="text-center mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full text-sm font-semibold text-orange-400 mb-6"
-          >
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full text-sm font-semibold text-orange-400 mb-6">
             <Zap size={16} />
             Built for Unfair Advantages
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold text-white mb-6"
-          >
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
             Technology that<br />
             <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
               Beats the Market
             </span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-gray-400 max-w-2xl mx-auto"
-          >
+          </h1>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Every feature engineered for one purpose: extracting consistent profit from bookmaker inefficiencies.
-          </motion.p>
+          </p>
         </div>
 
-        {/* Perfectly Symmetric Grid - All Equal Heights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr">
           {features.map((feature, index) => (
-            <motion.div
+            <div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 + 0.3 }}
-              whileHover={{ scale: 1.02, y: -4 }}
-              className="flex flex-col bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-500 group"
+              className="flex flex-col bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 hover:shadow-2xl hover:shadow-orange-500/10 hover:scale-[1.02] hover:-translate-y-1 transition-all duration-500 group"
             >
-              {/* Icon */}
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-xl flex items-center justify-center text-orange-500 mb-6 group-hover:from-orange-500/20 group-hover:to-orange-600/10 group-hover:scale-110 transition-all duration-300 border border-orange-500/20">
                 {feature.icon}
               </div>
 
-              {/* Title */}
               <h3 className="text-xl font-black text-white mb-3 group-hover:text-orange-400 transition-colors">
                 {feature.title}
               </h3>
 
-              {/* Description - flex-1 ensures all descriptions take equal space */}
               <p className="text-gray-400 text-sm leading-relaxed flex-1 mb-4">
                 {feature.description}
               </p>
 
-              {/* Visual indicator - fixed height at bottom */}
               <div className="h-12 flex items-end">
                 {feature.visual}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-20 text-center"
-        >
+        <div className="mt-20 text-center">
           <div className="bg-gradient-to-br from-[#171717] to-[#0a0a0a] border border-white/10 rounded-2xl p-12">
             <h2 className="text-3xl font-bold text-white mb-4">
               Ready to Get Your Edge?
@@ -164,7 +133,7 @@ export default function FeaturesPage() {
               Start Free Trial
             </button>
           </div>
-        </motion.div>
+        </div>
 
       </div>
     </div>
