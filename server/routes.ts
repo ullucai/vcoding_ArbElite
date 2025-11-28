@@ -30,3 +30,49 @@ router.post('/auth/logout', (req, res) => {
 })
 
 export default router
+
+// Create user with admin privileges (bypass RLS)
+router.post('/create-user', async (req, res) => {
+  try {
+    const { userId, email, username, tier } = req.body
+
+    if (!userId || !email || !username) {
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+
+    // Create Supabase admin client with service role key
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || ''
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+
+    if (!supabaseServiceKey) {
+      console.error('[API] SUPABASE_SERVICE_ROLE_KEY not set')
+      return res.status(500).json({ error: 'Server configuration error' })
+    }
+
+    const admin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { persistSession: false }
+    })
+
+    // Insert user bypassing RLS
+    const { data, error } = await admin
+      .from('users')
+      .insert({
+        id: userId,
+        email: email,
+        username: username.toLowerCase(),
+        tier: tier || 'free'
+      })
+
+    if (error) {
+      console.error('[API] User creation error:', error)
+      return res.status(400).json({ error: error.message })
+    }
+
+    res.json({ success: true, data })
+  } catch (error) {
+    console.error('[API] Create user error:', error)
+    res.status(500).json({ error: 'Failed to create user' })
+  }
+})
+
