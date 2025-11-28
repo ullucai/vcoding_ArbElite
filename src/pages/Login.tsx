@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useLocation } from 'wouter'
 import { auth } from '../lib/supabase'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 
 export default function Login() {
   const [, setLocation] = useLocation()
@@ -13,7 +13,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -71,7 +71,7 @@ export default function Login() {
             </Button>
             <button
               type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => setIsSignUp(!isSignUp)}
               className="text-sm text-blue-600 hover:underline"
               data-testid="button-toggle-auth"
             >
