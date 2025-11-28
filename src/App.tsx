@@ -139,17 +139,7 @@ function App() {
         <Route>{() => <NotFound />}</Route>
       </Switch>
 
-      <LoginModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        onLoginSuccess={(tier, user) => {
-          setIsUserLoggedIn(true);
-          setUserTier(tier);
-          setUsername(user);
-          setIsAuthModalOpen(false);
-          navigate('/dashboard');
-        }}
-      />
+      {/* LoginModal disabled - using /login page instead with Supabase auth */}
     </div>
   );
 }
