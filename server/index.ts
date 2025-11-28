@@ -1,10 +1,13 @@
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { fetchArbitrageOpportunities } from './oddsApi';
 
 const app = express();
 // Use environment port or default to 5000
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Middleware
 app.use(cors());
@@ -331,23 +334,40 @@ app.post('/api/github-push-bolt', async (req, res) => {
   }
 });
 
-// --- STATIC FILES (Production/Preview) ---
-// Serve built frontend files if available
-// For Replit development, Vite proxy handles frontend
-import { createServer as createViteServer } from 'vite';
+// --- STATIC FILES & FRONTEND ---
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isProduction = process.env.NODE_ENV === 'production';
+const distPath = path.join(__dirname, '../dist');
 
-const vite = await createViteServer({
-  server: { 
-    middlewareMode: true,
-    host: '0.0.0.0'
-  },
-  appType: 'spa'
-});
+if (isProduction && fs.existsSync(distPath)) {
+  // Production: Serve built dist files
+  console.log('[Server] Production mode - serving built files from dist/');
+  app.use(express.static(distPath));
+  
+  // SPA fallback: serve index.html for all non-API routes
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+} else {
+  // Development: Use Vite dev server with HMR
+  console.log('[Server] Development mode - using Vite dev server');
+  
+  const { createServer: createViteServer } = await import('vite');
+  
+  const vite = await createViteServer({
+    server: { 
+      middlewareMode: true,
+      host: '0.0.0.0'
+    },
+    appType: 'spa'
+  });
 
-app.use(vite.middlewares);
+  app.use(vite.middlewares);
+}
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server is running and listening on port ${PORT}`);
   console.log(`   - Health Check: http://0.0.0.0:${PORT}/api/health`);
   console.log(`   - Data Feed:    http://0.0.0.0:${PORT}/api/opportunities`);
+  console.log(`   - Mode: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
 });
