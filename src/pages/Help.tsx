@@ -2,7 +2,11 @@ import { useState } from 'react';
 import InfoPageLayout from '../layouts/InfoPageLayout';
 import { ChevronDown, Search } from 'lucide-react';
 
-export default function Help() {
+interface HelpProps {
+  onNavigate?: (page: string) => void;
+}
+
+export default function Help({ onNavigate }: HelpProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -17,7 +21,7 @@ export default function Help() {
     },
     {
       question: 'Is arbitrage betting risk-free?',
-      answer: 'While arbitrage betting is mathematically risk-free in theory, practical risks exist: odds can change before you complete all bets, bookmakers may limit your account, and settlement differences can occur. Our platform includes risk management tools to help mitigate these factors, but no trading strategy is completely without risk.'
+      answer: 'Arbitrage betting is designed to identify favorable mathematical opportunities, but practical risks always exist: odds can change before you complete all bets, bookmakers may limit your account, and settlement differences can occur. Our platform includes risk management tools to help mitigate these factors. Like any investment strategy, past performance does not guarantee future results, and you should never bet more than you can afford to lose.'
     },
     {
       question: 'Why do bookmakers offer different odds?',
@@ -113,18 +117,10 @@ export default function Help() {
       )}
 
       <div className="mt-12 bg-gradient-to-br from-orange-600/10 to-orange-800/10 border border-orange-600/20 rounded-lg p-8">
-        <h3 className="text-2xl font-bold text-white mb-4">
-          Still have questions?
-        </h3>
-        <p className="text-neutral-300 mb-6">
-          Can't find what you're looking for? Our support team is here to help.
+        <h2 className="text-2xl font-bold text-white mb-4">Still Have Questions?</h2>
+        <p className="text-neutral-300 leading-relaxed">
+          Can't find what you're looking for? Our support team is here to help. Reach out to us anytime at <a href="mailto:info@arbelite.co" className="text-orange-500 hover:text-orange-400 font-semibold transition-colors">info@arbelite.co</a>
         </p>
-        <a
-          href="/contact"
-          className="inline-block px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors"
-        >
-          Contact Support
-        </a>
       </div>
     </InfoPageLayout>
   );
