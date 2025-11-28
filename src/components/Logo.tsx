@@ -3,8 +3,8 @@ export default function Logo() {
     <div className="flex items-center gap-3 group cursor-pointer">
       {/* Hexagonal Elite Badge */}
       <div className="relative w-12 h-12 flex items-center justify-center">
-        {/* Animated outer pulse */}
-        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-orange-500/30 to-orange-600/10 blur-xl group-hover:from-orange-500/40 group-hover:to-orange-600/20 transition-all duration-500 animate-pulse" />
+        {/* Animated outer pulse - continuous */}
+        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-orange-500/40 to-orange-600/20 blur-xl transition-all duration-500 animate-pulse" />
 
         {/* Main hexagon container */}
         <div className="relative z-10 w-full h-full">
@@ -41,16 +41,16 @@ export default function Logo() {
               fill="none"
               stroke="white"
               strokeWidth="1.5"
-              opacity="0.4"
-              className="group-hover:stroke-orange-300 transition-all duration-300"
+              opacity="0.6"
+              className="transition-all duration-300"
             />
 
             {/* Center diamond */}
             <path
               d="M50 35 L60 50 L50 65 L40 50 Z"
               fill="white"
-              opacity="0.9"
-              className="group-hover:fill-orange-300 transition-all duration-300"
+              opacity="1"
+              className="transition-all duration-300 animate-pulse"
             />
 
             {/* Elite star accent */}
@@ -64,8 +64,8 @@ export default function Logo() {
           </svg>
         </div>
 
-        {/* Floating particles effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        {/* Floating particles effect - continuous */}
+        <div className="absolute inset-0 opacity-100 transition-opacity duration-500">
           <div className="absolute top-0 right-0 w-1 h-1 bg-orange-400 rounded-full animate-ping" style={{ animationDelay: '0ms' }} />
           <div className="absolute bottom-0 left-0 w-1 h-1 bg-orange-500 rounded-full animate-ping" style={{ animationDelay: '200ms' }} />
         </div>
@@ -77,7 +77,7 @@ export default function Logo() {
           ARB<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600 group-hover:from-orange-400 group-hover:to-orange-500 transition-all duration-300">ELITE</span>
         </span>
         <span className="text-[0.5rem] font-bold tracking-[0.15em] text-orange-500/60 uppercase mt-0.5">
-          Precision Trading
+          Unlock Your Edge
         </span>
       </div>
     </div>
