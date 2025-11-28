@@ -15,7 +15,7 @@ export default function Comparison() {
     {
       aspect: 'Outcome Predictability',
       gambling: { text: 'Unpredictable', negative: true },
-      arbelite: { text: 'Guaranteed Profit', positive: true }
+      arbelite: { text: 'Calculated Profit Potential', positive: true }
     },
     {
       aspect: 'Long-term Results',
@@ -111,7 +111,7 @@ export default function Comparison() {
             <div>
               <h3 className="text-xl font-bold text-white mb-2">The Mathematical Advantage</h3>
               <p className="text-neutral-300 leading-relaxed">
-                Traditional betting relies on predicting outcomes, where the house always has an edge. Arbitrage betting exploits price differences between bookmakers, guaranteeing profit regardless of the result. It's not gambling—it's pure mathematics.
+                Traditional betting relies on predicting outcomes, where the house always has an edge. Arbitrage betting exploits price differences between bookmakers, calculating mathematically favorable returns regardless of the result. It's not gambling—it's pure mathematics.
               </p>
             </div>
           </div>
