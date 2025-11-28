@@ -241,18 +241,32 @@ const pushFilesToRepo = async (repoName: string) => {
   let pushedCount = 0;
   for (const file of allFiles) {
     try {
+      // Get SHA if file exists
+      let sha: string | undefined;
+      try {
+        const existing = await octokit.repos.getContent({
+          owner,
+          repo: repoName,
+          path: file.path
+        });
+        sha = (existing.data as any).sha;
+      } catch (err) {
+        // File doesn't exist, no SHA needed
+      }
+
       await octokit.repos.createOrUpdateFileContents({
         owner,
         repo: repoName,
         path: file.path,
         message: `Add ${file.path}`,
         content: Buffer.from(file.content).toString('base64'),
+        ...(sha && { sha }),
         committer: {
           name: 'ArbElite Bot',
           email: 'arbelite@bot.local'
         },
         author: {
-          name: 'ArbElite Bot',
+          name: 'ArbeLite Bot',
           email: 'arbelite@bot.local'
         }
       });
