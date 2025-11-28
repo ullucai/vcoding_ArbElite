@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
-import { Settings, Wallet, ShieldCheck, Power, Filter, Lock, Activity, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings, Wallet, ShieldCheck, Power, Filter, Lock, Activity, TrendingUp, Zap } from 'lucide-react';
 
-export default function Dashboard({ isUserLoggedIn }: { isUserLoggedIn: boolean }) {
+interface OpportunityData {
+  id: string;
+  event_name: string;
+  sport_key: string;
+  sport_title: string;
+  profit_percentage: number;
+  home_team: string;
+  away_team: string;
+  tier: 'FREE' | 'PREMIUM';
+  time_until_start: string;
+  bets: Array<{ outcome: string; bookmaker: string; odds: number }>;
+}
+
+export default function Dashboard({ isUserLoggedIn, userTier }: { isUserLoggedIn: boolean; userTier: string }) {
   const [bankroll, setBankroll] = useState(2500);
+  const [opportunities, setOpportunities] = useState<OpportunityData[]>([]);
   const [bookies, setBookies] = useState([
     { name: 'Pinnacle', active: true },
     { name: 'Bet365', active: true },
@@ -14,11 +28,62 @@ export default function Dashboard({ isUserLoggedIn }: { isUserLoggedIn: boolean 
 
   const isLocked = !isUserLoggedIn;
 
+  // Fetch opportunities on component mount
+  useEffect(() => {
+    const fetchOpportunities = async () => {
+      try {
+        const response = await fetch('/api/opportunities', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tier: userTier === 'admin' || userTier === 'pro' ? 'premium' : 'free' })
+        });
+        const data = await response.json();
+        setOpportunities(data.opportunities || []);
+      } catch (error) {
+        console.error('Error fetching opportunities:', error);
+      }
+    };
+
+    fetchOpportunities();
+    // Refresh every 10 minutes to conserve quota
+    const interval = setInterval(fetchOpportunities, 600000);
+    return () => clearInterval(interval);
+  }, [userTier]);
+
   return (
     <div className="pt-24 px-4 md:px-8 max-w-[1600px] mx-auto pb-12 min-h-screen relative">
 
+      {/* ADMIN NOTICE - Only visible to admins */}
+      {userTier === 'admin' && (
+        <div className="mb-6 bg-orange-500/5 border border-orange-500/30 rounded-xl p-4">
+          <p className="text-sm text-orange-300">
+            <span className="font-bold">Admin Mode:</span> Use mock/test data for demonstration purposes, OR Adjust the arbitrage threshold to find more marginal opportunities
+          </p>
+        </div>
+      )}
+
       {/* SECTION A: COMMAND CENTER (Visible Preview) */}
-      <div className="grid lg:grid-cols-3 gap-6 mb-8">
+      <div className={`grid gap-6 mb-8 ${userTier === 'admin' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
+         {/* API Quota - Admin Only */}
+         {userTier === 'admin' && (
+           <div className="bg-[#171717] border border-orange-500/20 p-6 rounded-2xl" data-testid="card-api-quota">
+             <h3 className="text-orange-500 text-xs font-bold uppercase tracking-wider mb-4">API Quota</h3>
+             <div className="text-3xl font-black text-orange-400 mb-2">340 <span className="text-sm text-orange-300">/500</span></div>
+             <div className="text-xs text-orange-300/60">Requests remaining this month</div>
+           </div>
+         )}
+
+         {/* Upgrade Button - Non-Admin Only */}
+         {userTier !== 'admin' && (
+           <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/30 p-6 rounded-2xl flex flex-col justify-center">
+             <h3 className="text-orange-500 text-xs font-bold uppercase tracking-wider mb-3">Premium Access</h3>
+             <p className="text-sm text-gray-300 mb-4">Unlock all arbitrage opportunities</p>
+             <button onClick={() => window.location.href = '/pricing'} className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold py-2 px-4 rounded-lg transition-all hover:scale-105">
+               Upgrade Now
+             </button>
+           </div>
+         )}
+
          {/* Strategy Card - EDITABLE BANKROLL */}
          <div className="bg-[#171717] border border-white/10 p-6 rounded-2xl relative overflow-hidden group hover:border-orange-500/20 transition-colors">
             <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -112,34 +177,41 @@ export default function Dashboard({ isUserLoggedIn }: { isUserLoggedIn: boolean 
               </button>
            </div>
            <div className="p-6 grid gap-4">
-               {[
-                 { sport: 'NBA', event: 'Lakers vs Celtics', yield: 4.2, liquidity: 8500, decay: '2m 15s' },
-                 { sport: 'NFL', event: 'Chiefs vs Bills', yield: 3.8, liquidity: 12000, decay: '4m 32s' },
-                 { sport: 'EPL', event: 'Man City vs Arsenal', yield: 5.1, liquidity: 6200, decay: '1m 48s' },
-                 { sport: 'NHL', event: 'Bruins vs Rangers', yield: 3.5, liquidity: 9800, decay: '5m 10s' },
-                 { sport: 'Tennis', event: 'Djokovic vs Alcaraz', yield: 6.3, liquidity: 4100, decay: '52s' }
-               ].map((opp, i) => (
+               {opportunities.length === 0 ? (
+                 <div className="text-center py-12 text-gray-500">
+                   <TrendingUp className="mx-auto mb-2 opacity-50" size={32} />
+                   <p>5 live opportunities loading...</p>
+                 </div>
+               ) : (
+                 opportunities.map((opp, i) => (
                    <div key={i} className="bg-white/5 border border-white/5 hover:border-orange-500/30 rounded-xl p-4 flex items-center justify-between transition-all group cursor-pointer">
                      <div className="flex items-center gap-4">
                        <div className="bg-orange-500/10 px-3 py-1 rounded-lg border border-orange-500/20">
-                         <span className="text-xs font-black text-orange-400">{opp.sport}</span>
+                         <span className="text-xs font-black text-orange-400">{opp.sport_title}</span>
                        </div>
                        <div>
-                         <div className="text-white font-bold text-sm">{opp.event}</div>
-                         <div className="text-gray-500 text-xs mt-1">Decay: {opp.decay}</div>
+                         <div className="font-bold text-white text-sm flex items-center gap-2">
+                           {opp.event_name}
+                           <span className={`text-xs px-2 py-1 rounded font-semibold ${
+                             opp.tier === 'PREMIUM' 
+                               ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
+                               : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                           }`}>
+                             {opp.tier}
+                           </span>
+                         </div>
+                         <div className="text-gray-500 text-xs mt-1">{opp.time_until_start} • {opp.bets?.length || 0} bookmakers</div>
                        </div>
                      </div>
                      <div className="flex items-center gap-6">
                        <div className="text-right">
-                         <div className="text-xs text-gray-500">Yield</div>
-                         <div className="text-lg font-black text-green-400">{opp.yield}%</div>
-                       </div>
-                       <div className="text-right">
-                         <div className="text-xs text-gray-500">Liquidity</div>
-                         <div className="text-sm font-bold text-white">${opp.liquidity.toLocaleString()}</div>
+                         <div className="text-xs text-gray-500">Profit %</div>
+                         <div className={`text-lg font-black ${opp.profit_percentage >= 2.5 ? 'text-yellow-400' : 'text-green-400'}`}>
+                           +{opp.profit_percentage}%
+                         </div>
                        </div>
                        <button className="bg-orange-500 hover:bg-orange-400 text-white font-bold px-6 py-2 rounded-lg transition opacity-0 group-hover:opacity-100">
-                         Execute
+                         Details
                        </button>
                      </div>
                    </div>
