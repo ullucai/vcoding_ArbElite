@@ -6,6 +6,7 @@ import Features from './components/landing/Features';
 import Footer from './components/landing/Footer';
 import DashboardContainer from './pages/DashboardContainer';
 import LoginModal from './components/auth/LoginModal';
+import Login from './pages/Login';
 import Pricing from './pages/Pricing';
 import FeaturesPage from './pages/FeaturesPage';
 import AboutPage from './pages/AboutPage';
@@ -61,6 +62,10 @@ function App() {
               <HomePage onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} />
             </>
           )}
+        </Route>
+
+        <Route path="/login">
+          {() => <Login />}
         </Route>
 
         <Route path="/dashboard">
