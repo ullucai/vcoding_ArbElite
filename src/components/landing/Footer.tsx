@@ -43,7 +43,7 @@ export default function Footer({ onNavigate }: FooterProps) {
               <Logo />
             </div>
             <p className="text-neutral-400 text-sm mb-6 max-w-xs">
-              Mathematical arbitrage platform for strategic sports investors. Guaranteed yields through data-driven execution.
+              Mathematical arbitrage platform for strategic sports investors. Calculated returns through data-driven analysis.
             </p>
 
             <div className="flex items-center gap-2 mb-4">
@@ -58,10 +58,15 @@ export default function Footer({ onNavigate }: FooterProps) {
                   href={social.href}
                   aria-label={social.label}
                   className="w-10 h-10 bg-white/5 hover:bg-orange-500/20 border border-white/10 hover:border-orange-500/30 rounded-lg flex items-center justify-center text-neutral-400 hover:text-orange-400 transition-all"
+                  data-testid={`footer-social-${social.label.toLowerCase()}`}
                 >
                   {social.icon}
                 </a>
               ))}
+            </div>
+            
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <p className="text-xs text-gray-600 mb-2">Contact: <a href="mailto:info@arbelite.co" className="text-orange-500 hover:text-orange-400">info@arbelite.co</a></p>
             </div>
           </div>
 
@@ -137,7 +142,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             </p>
 
             <div className="flex items-center gap-6 text-xs text-neutral-500">
-              <span>Arbitrage is legal and risk-free</span>
+              <span>Legal. Logical. Profitable.</span>
               <span className="text-neutral-700">•</span>
               <span>18+ only</span>
               <span className="text-neutral-700">•</span>
