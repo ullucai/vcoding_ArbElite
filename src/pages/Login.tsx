@@ -26,7 +26,7 @@ export default function Login() {
           .single()
         
         if (existingUser) {
-          setError('Bu kullanıcı adı zaten alınmış')
+          setError('This username is already taken')
           setLoading(false)
           return
         }
@@ -58,7 +58,7 @@ export default function Login() {
             })
 
           if (insertErr) {
-            setError('Profil oluşturulurken hata: ' + insertErr.message)
+            setError('Error creating profile: ' + insertErr.message)
           } else {
             // Auto-login by storing session
             localStorage.setItem('auth_user', JSON.stringify({
@@ -97,7 +97,7 @@ export default function Login() {
         }
       }
     } catch (err) {
-      setError('Kimlik doğrulama başarısız')
+      setError('Authentication failed')
     } finally {
       setLoading(false)
     }
@@ -111,8 +111,8 @@ export default function Login() {
         <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/10 to-transparent blur-3xl" />
         
         <div className="relative bg-[#0f0f0f] border border-white/10 rounded-2xl p-8 backdrop-blur-xl">
-          <h2 className="text-3xl font-bold text-white mb-1">{isSignUp ? 'Hesap Oluştur' : 'Giriş Yap'}</h2>
-          <p className="text-neutral-400 text-sm mb-6">Arbitraj yolculuğunu başlat</p>
+          <h2 className="text-3xl font-bold text-white mb-1">{isSignUp ? 'Create Account' : 'Sign In'}</h2>
+          <p className="text-neutral-400 text-sm mb-6">Start your arbitrage journey</p>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -130,7 +130,7 @@ export default function Login() {
 
             {isSignUp && (
               <div>
-                <label className="block text-sm text-neutral-400 mb-2">Kullanıcı Adı</label>
+                <label className="block text-sm text-neutral-400 mb-2">Username</label>
                 <input
                   type="text"
                   placeholder="your_username"
@@ -140,12 +140,12 @@ export default function Login() {
                   className="w-full px-4 py-2.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-orange-500/50 transition"
                   data-testid="input-username"
                 />
-                <p className="text-xs text-neutral-500 mt-1">İngilizce harf, rakam ve alt çizgi</p>
+                <p className="text-xs text-neutral-500 mt-1">Letters, numbers and underscore only</p>
               </div>
             )}
 
             <div>
-              <label className="block text-sm text-neutral-400 mb-2">Şifre</label>
+              <label className="block text-sm text-neutral-400 mb-2">Password</label>
               <input
                 type="password"
                 placeholder="••••••••"
@@ -170,7 +170,7 @@ export default function Login() {
               className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95"
               data-testid="button-submit"
             >
-              {loading ? 'Yükleniyor...' : isSignUp ? 'Hesap Oluştur' : 'Giriş Yap'}
+              {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
             </button>
             
             <button
@@ -184,7 +184,7 @@ export default function Login() {
               className="w-full text-sm text-orange-400 hover:text-orange-300 transition"
               data-testid="button-toggle-auth"
             >
-              {isSignUp ? 'Zaten hesabın var mı? Giriş Yap' : 'Hesap oluştur'}
+              {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
             </button>
           </form>
         </div>
