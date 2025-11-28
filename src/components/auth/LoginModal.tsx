@@ -40,11 +40,14 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
           if (email === 'admin' && password === 'admin123') {
             onLoginSuccess('admin', email);
             onClose();
-          } else if (email === 'fadmin' && password === 'fadmin') {
+          } else if (email === 'user' && password === 'user') {
             onLoginSuccess('free', email);
             onClose();
+          } else if (email === 'premium' && password === 'premium') {
+            onLoginSuccess('pro', email);
+            onClose();
           } else {
-            setError('Invalid credentials. Try fadmin/fadmin (Free) or admin/admin123 (Full Access)');
+            setError('Invalid username or password');
           }
         }}>
           {isSignUp && (
@@ -62,12 +65,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Username</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
               <input
                 type="text"
-                placeholder="admin"
+                placeholder="Username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
@@ -81,7 +84,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
               <input
                 type="password"
-                placeholder="admin"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
@@ -104,12 +107,25 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
         </form>
 
         <div className="mt-6 text-center">
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-gray-400 hover:text-orange-500 transition text-sm"
-          >
-            {isSignUp ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
-          </button>
+          {!isSignUp && (
+            <p className="text-gray-400 text-sm">
+              Don't have an account?{' '}
+              <button
+                onClick={() => setIsSignUp(true)}
+                className="text-orange-500 hover:text-orange-400 font-semibold transition"
+              >
+                Sign up now
+              </button>
+            </p>
+          )}
+          {isSignUp && (
+            <button
+              onClick={() => setIsSignUp(false)}
+              className="text-gray-400 hover:text-orange-500 transition text-sm"
+            >
+              Already have an account? Login
+            </button>
+          )}
         </div>
       </div>
     </div>
