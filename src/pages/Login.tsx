@@ -22,7 +22,7 @@ export default function Login() {
         const { data: existingUser } = await supabase
           .from('users')
           .select('username')
-          .eq('username', username)
+          .eq('username', username.toLowerCase())
           .single()
         
         if (existingUser) {
@@ -46,29 +46,38 @@ export default function Login() {
 
         if (err) {
           setError(err.message)
-        } else if (data.user) {
-          // Insert user into users table
-          const { error: insertErr } = await supabase
-            .from('users')
-            .insert({
-              id: data.user.id,
+          setLoading(false)
+          return
+        }
+
+        if (data.user) {
+          // Use backend endpoint to create user (bypasses RLS)
+          const createUserRes = await fetch('/api/create-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: data.user.id,
               email: data.user.email,
-              username: username,
+              username: username.toLowerCase(),
               tier: 'free'
             })
+          })
 
-          if (insertErr) {
-            setError('Error creating profile: ' + insertErr.message)
-          } else {
-            // Auto-login by storing session
-            localStorage.setItem('auth_user', JSON.stringify({
-              id: data.user.id,
-              email: data.user.email,
-              username: username,
-              tier: 'free'
-            }))
-            setLocation('/dashboard')
+          if (!createUserRes.ok) {
+            const errData = await createUserRes.json()
+            setError('Error creating profile: ' + (errData.error || 'Unknown error'))
+            setLoading(false)
+            return
           }
+
+          // Auto-login by storing session
+          localStorage.setItem('auth_user', JSON.stringify({
+            id: data.user.id,
+            email: data.user.email,
+            username: username.toLowerCase(),
+            tier: 'free'
+          }))
+          setLocation('/dashboard')
         }
       } else {
         // Sign in
@@ -79,7 +88,11 @@ export default function Login() {
 
         if (err) {
           setError(err.message)
-        } else if (data.user) {
+          setLoading(false)
+          return
+        }
+
+        if (data.user) {
           // Get user profile
           const { data: userProfile } = await supabase
             .from('users')
@@ -97,7 +110,7 @@ export default function Login() {
         }
       }
     } catch (err) {
-      setError('Authentication failed')
+      setError('Authentication failed: ' + String(err))
     } finally {
       setLoading(false)
     }
