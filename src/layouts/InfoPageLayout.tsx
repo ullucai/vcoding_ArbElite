@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import Logo from '../components/Logo';
 import { ArrowLeft } from 'lucide-react';
 
@@ -10,6 +10,8 @@ interface InfoPageLayoutProps {
 }
 
 export default function InfoPageLayout({ children, title, description }: InfoPageLayoutProps) {
+  const [location, navigate] = useLocation();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -20,13 +22,13 @@ export default function InfoPageLayout({ children, title, description }: InfoPag
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Logo />
-            <Link
-              to="/"
+            <button
+              onClick={() => navigate('/')}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Home
-            </Link>
+            </button>
           </div>
         </div>
       </nav>
