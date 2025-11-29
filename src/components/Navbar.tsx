@@ -1,9 +1,37 @@
 import { useState } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, LogOut } from 'lucide-react';
 import Logo from './Logo';
 
-export default function Navbar() {
+type UserTier = 'free' | 'pro' | 'admin';
+
+interface NavbarProps {
+  onOpenAuth?: () => void;
+  onNavigate?: (page: string) => void;
+  isUserLoggedIn?: boolean;
+  userTier?: UserTier;
+  username?: string;
+}
+
+export default function Navbar({ onOpenAuth, onNavigate, isUserLoggedIn = false, userTier = 'free', username = '' }: NavbarProps) {
   const [showAlertModal, setShowAlertModal] = useState(false);
+
+  const getTierLabel = () => {
+    if (userTier === 'admin') return 'ADMIN';
+    if (userTier === 'pro') return 'PRO';
+    return 'FREE';
+  };
+
+  const getTierColor = () => {
+    if (userTier === 'admin') return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+    if (userTier === 'pro') return 'bg-orange-500/20 text-orange-300 border-orange-500/30';
+    return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_user');
+    window.location.href = '/';
+  };
+
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-md bg-black/50 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,6 +53,24 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
+            {isUserLoggedIn && username && (
+              <div className="flex items-center gap-3 pr-3 border-r border-white/10">
+                <div className="text-right">
+                  <div className="text-sm font-medium text-white">{username}</div>
+                  <div className={`text-xs font-semibold px-2 py-1 rounded border ${getTierColor()}`}>
+                    {getTierLabel()}
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="p-2 hover:bg-white/5 rounded-lg transition-colors text-neutral-400 hover:text-red-400"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             <button
               onClick={() => setShowAlertModal(true)}
               className="relative p-2 hover:bg-white/5 rounded-lg transition-colors group"
@@ -33,9 +79,15 @@ export default function Navbar() {
               <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
             </button>
 
-            <button className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95">
-              Go Pro
-            </button>
+            {!isUserLoggedIn ? (
+              <button onClick={onOpenAuth} className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95">
+                Login
+              </button>
+            ) : (
+              <button className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95">
+                Upgrade
+              </button>
+            )}
           </div>
 
           {showAlertModal && (
