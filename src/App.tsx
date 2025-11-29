@@ -36,7 +36,6 @@ function App() {
   const [username, setUsername] = useState('');
   const [location, navigate] = useLocation();
 
-  // Update auth state from localStorage
   const updateAuthState = useCallback(() => {
     const authUser = localStorage.getItem('auth_user');
     if (authUser) {
@@ -54,17 +53,14 @@ function App() {
     }
   }, []);
 
-  // Initialize auth state on mount
   useEffect(() => {
     updateAuthState();
   }, [updateAuthState]);
 
-  // Check auth state whenever location changes (e.g., after login)
   useEffect(() => {
     updateAuthState();
   }, [location, updateAuthState]);
 
-  // Redirect to dashboard when logged in and on login page
   useEffect(() => {
     if (isUserLoggedIn && location === '/login') {
       navigate('/dashboard');
@@ -93,8 +89,8 @@ function App() {
         <Route path="/">
           {() => (
             <>
-              <Navbar isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
-              <HomePage onOpenAuth={() => {}} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
+              <Navbar onOpenAuth={() => navigate('/login')} onNavigate={handleNavigate} />
+              <HomePage onOpenAuth={() => navigate('/login')} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
             </>
           )}
         </Route>
@@ -136,7 +132,7 @@ function App() {
         <Route path="/features">
           {() => (
             <>
-              <Navbar onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} />
+              <Navbar onOpenAuth={() => navigate('/login')} onNavigate={handleNavigate} />
               <FeaturesPage />
             </>
           )}
@@ -145,7 +141,7 @@ function App() {
         <Route path="/pricing">
           {() => (
             <>
-              <Navbar onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} />
+              <Navbar onOpenAuth={() => navigate('/login')} onNavigate={handleNavigate} />
               <Pricing />
             </>
           )}
@@ -154,7 +150,7 @@ function App() {
         <Route path="/about">
           {() => (
             <>
-              <Navbar onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} />
+              <Navbar onOpenAuth={() => navigate('/login')} onNavigate={handleNavigate} />
               <AboutPage />
             </>
           )}
@@ -182,8 +178,6 @@ function App() {
 
         <Route>{() => <NotFound />}</Route>
       </Switch>
-
-      {/* LoginModal disabled - using /login page instead with Supabase auth */}
     </div>
   );
 }
