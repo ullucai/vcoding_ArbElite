@@ -101,6 +101,41 @@ router.post('/auth/signup', async (req, res) => {
   }
 })
 
+// Lookup email by username (bypasses RLS with admin client)
+router.post('/auth/lookup-email', async (req, res) => {
+  try {
+    const { username } = req.body
+
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required' })
+    }
+
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || ''
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || ''
+
+    // Use admin client to bypass RLS
+    const admin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey, {
+      auth: { persistSession: false }
+    })
+
+    const { data, error } = await admin
+      .from('users')
+      .select('email')
+      .eq('username', username.toLowerCase())
+      .single()
+
+    if (error || !data) {
+      return res.status(404).json({ error: 'Username not found' })
+    }
+
+    res.json({ email: data.email })
+  } catch (error) {
+    console.error('[API] Lookup email error:', error)
+    res.status(500).json({ error: 'Failed to lookup email' })
+  }
+})
+
 // Sync user profile - create if missing (used after login)
 router.post('/auth/sync-profile', async (req, res) => {
   try {
