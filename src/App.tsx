@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Route, Switch, useLocation } from 'wouter';
 import Navbar from './components/layout/Navbar';
 import Hero from './components/landing/Hero';
@@ -37,6 +37,26 @@ function App() {
   const [userTier, setUserTier] = useState<UserTier>('free');
   const [username, setUsername] = useState('');
   const [location, navigate] = useLocation();
+
+  // Initialize auth state from localStorage on mount
+  useEffect(() => {
+    const authUser = localStorage.getItem('auth_user');
+    if (authUser) {
+      try {
+        const user = JSON.parse(authUser);
+        setIsUserLoggedIn(true);
+        setUserTier((user.tier || 'free') as UserTier);
+        setUsername(user.username || '');
+        
+        // Redirect to dashboard if on home/login pages
+        if (location === '/' || location === '/login') {
+          navigate('/dashboard');
+        }
+      } catch (e) {
+        console.error('Failed to parse auth user from localStorage');
+      }
+    }
+  }, []);
 
   const handleNavigate = (page: string) => {
     const pageMap: Record<string, string> = {
