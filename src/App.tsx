@@ -38,7 +38,7 @@ function App() {
   const [username, setUsername] = useState('');
   const [location, navigate] = useLocation();
 
-  // Initialize auth state from localStorage on mount
+  // Initialize auth state from localStorage on mount and location changes
   useEffect(() => {
     const authUser = localStorage.getItem('auth_user');
     if (authUser) {
@@ -47,16 +47,18 @@ function App() {
         setIsUserLoggedIn(true);
         setUserTier((user.tier || 'free') as UserTier);
         setUsername(user.username || '');
-        
-        // Redirect to dashboard if on home/login pages
-        if (location === '/' || location === '/login') {
-          navigate('/dashboard');
-        }
       } catch (e) {
         console.error('Failed to parse auth user from localStorage');
       }
     }
   }, []);
+
+  // Redirect to dashboard when logged in and on home/login pages
+  useEffect(() => {
+    if (isUserLoggedIn && (location === '/' || location === '/login')) {
+      navigate('/dashboard');
+    }
+  }, [isUserLoggedIn, location]);
 
   const handleNavigate = (page: string) => {
     const pageMap: Record<string, string> = {
