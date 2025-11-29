@@ -22,26 +22,8 @@ router.post('/auth/signup', async (req, res) => {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
     if (!supabaseServiceKey) {
-      console.warn('[API] No SUPABASE_SERVICE_ROLE_KEY - using regular signup')
-      // Fallback: still create user, but without email verification bypass
-      const regularClient = createClient(supabaseUrl, import.meta.env.VITE_SUPABASE_ANON_KEY || '')
-      const { data, error } = await regularClient.auth.signUp({
-        email,
-        password,
-        options: { data: { username } }
-      })
-      
-      if (error) return res.status(400).json({ error: error.message })
-      if (data.user) {
-        return res.json({
-          user: {
-            id: data.user.id,
-            email: data.user.email,
-            username: username.toLowerCase()
-          }
-        })
-      }
-      return res.status(400).json({ error: 'Signup failed' })
+      console.warn('[API] No SUPABASE_SERVICE_ROLE_KEY - email verification may be required')
+      return res.status(500).json({ error: 'Server configuration incomplete' })
     }
 
     // Admin client - bypass email verification
