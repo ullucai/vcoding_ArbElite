@@ -101,6 +101,59 @@ router.post('/auth/signup', async (req, res) => {
   }
 })
 
+// Sync user profile - create if missing (used after login)
+router.post('/auth/sync-profile', async (req, res) => {
+  try {
+    const { userId, email, username } = req.body
+
+    if (!userId || !email) {
+      return res.status(400).json({ error: 'userId and email are required' })
+    }
+
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || ''
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || ''
+
+    // Use admin client to bypass RLS
+    const admin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey, {
+      auth: { persistSession: false }
+    })
+
+    // Check if profile exists
+    const { data: existing } = await admin
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (existing) {
+      return res.json({ success: true, user: existing })
+    }
+
+    // Create profile if it doesn't exist
+    const { data: newUser, error } = await admin
+      .from('users')
+      .insert({
+        id: userId,
+        email: email,
+        username: username?.toLowerCase() || email.split('@')[0].toLowerCase(),
+        tier: 'free'
+      })
+      .select()
+      .single()
+
+    if (error && error.code !== '23505') { // 23505 = unique_violation
+      console.error('[API] Profile sync error:', error)
+      return res.status(400).json({ error: error.message })
+    }
+
+    res.json({ success: true, user: newUser || existing })
+  } catch (error) {
+    console.error('[API] Sync profile error:', error)
+    res.status(500).json({ error: 'Failed to sync profile: ' + String(error).substring(0, 80) })
+  }
+})
+
 // Create user with admin privileges (bypass RLS)
 router.post('/create-user', async (req, res) => {
   try {
