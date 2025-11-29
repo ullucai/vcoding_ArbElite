@@ -21,7 +21,7 @@ import NotFound from './pages/NotFound';
 
 type UserTier = 'free' | 'pro' | 'admin';
 
-function HomePage({ onOpenAuth, onNavigate, isUserLoggedIn, userTier }: { onOpenAuth: () => void; onNavigate: (page: string) => void; isUserLoggedIn: boolean; userTier: UserTier }) {
+function HomePage({ onOpenAuth, onNavigate, isUserLoggedIn, userTier, username }: { onOpenAuth: () => void; onNavigate: (page: string) => void; isUserLoggedIn: boolean; userTier: UserTier; username: string }) {
   return (
     <main>
       <Hero onOpenAuth={onOpenAuth} isUserLoggedIn={isUserLoggedIn} userTier={userTier} />
@@ -53,9 +53,9 @@ function App() {
     }
   }, []);
 
-  // Redirect to dashboard when logged in and on home/login pages
+  // Redirect to dashboard when logged in and on login page
   useEffect(() => {
-    if (isUserLoggedIn && (location === '/' || location === '/login')) {
+    if (isUserLoggedIn && location === '/login') {
       navigate('/dashboard');
     }
   }, [isUserLoggedIn, location]);
@@ -82,8 +82,8 @@ function App() {
         <Route path="/">
           {() => (
             <>
-              <Navbar onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} />
-              <HomePage onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} />
+              <Navbar onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
+              <HomePage onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
             </>
           )}
         </Route>
