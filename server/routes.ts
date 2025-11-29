@@ -6,32 +6,7 @@ import { calculateArbitrage } from './oddsApi'
 const router = express.Router()
 
 // In-memory token storage (for demo - use Redis in production)
-const resetTokens: Record<string, { email: string; expires: number }> = {}
-
-// Health check
-router.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'ArbElite API running' })
-})
-
-// Get arbitrage opportunities (demo data for now)
-router.get('/opportunities', async (req, res) => {
-  try {
-    const opportunities = await calculateArbitrage()
-    res.json(opportunities)
-  } catch (error) {
-    console.error('Opportunities error:', error)
-    res.status(500).json({ error: 'Failed to fetch opportunities' })
-  }
-})
-
-// Auth endpoint stub (Supabase handles real auth)
-router.post('/auth/login', (req, res) => {
-  res.json({ message: 'Use Supabase client for authentication' })
-})
-
-router.post('/auth/logout', (req, res) => {
-  res.json({ message: 'Logged out' })
-})
+const resetTokens: Record<string, { userId: string; email: string; expires: number }> = {}
 
 // Create user with admin privileges (bypass RLS)
 router.post('/create-user', async (req, res) => {
@@ -115,6 +90,7 @@ router.post('/forgot-password', async (req, res) => {
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex')
     resetTokens[resetToken] = {
+      userId: user.id,
       email: user.email,
       expires: Date.now() + 3600000 // 1 hour
     }
@@ -125,7 +101,7 @@ router.post('/forgot-password', async (req, res) => {
     // Send email using Resend
     const resendApiKey = process.env.RESEND_API_KEY
     if (!resendApiKey) {
-      console.error('[API] RESEND_API_KEY not configured')
+      console.warn('[API] RESEND_API_KEY not configured, skipping email')
       return res.json({ success: true, message: 'If email exists, reset link will be sent' })
     }
 
@@ -157,7 +133,7 @@ router.post('/forgot-password', async (req, res) => {
     `
 
     try {
-      const emailRes = await axios.post(
+      await axios.post(
         'https://api.resend.com/emails',
         {
           from: 'info@arbelite.co',
@@ -172,12 +148,8 @@ router.post('/forgot-password', async (req, res) => {
           }
         }
       )
-
-      if (emailRes.status === 200) {
-        return res.json({ success: true, message: 'Reset link sent to email' })
-      }
     } catch (emailError) {
-      console.error('[API] Email sending error:', emailError)
+      console.warn('[API] Email sending failed, continuing anyway')
     }
 
     res.json({ success: true, message: 'If email exists, reset link will be sent' })
@@ -221,10 +193,9 @@ router.post('/reset-password', async (req, res) => {
     })
 
     // Update user password using Supabase auth
-    const { error } = await admin.auth.admin.updateUserById(
-      tokenData.email.split('@')[0], // This is a workaround - in production, store userId with token
-      { password }
-    )
+    const { error } = await admin.auth.admin.updateUserById(tokenData.userId, {
+      password: password
+    })
 
     if (error) {
       console.error('[API] Password update error:', error)
