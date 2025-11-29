@@ -67,20 +67,22 @@ export default function Login() {
         // Sign in with email or username
         let signInEmail = emailOrUsername
         
-        // If input doesn't contain @, treat as username and look up email
+        // If input doesn't contain @, treat as username and look up email via backend
         if (!emailOrUsername.includes('@')) {
-          const { data: userRecord } = await supabase
-            .from('users')
-            .select('email')
-            .eq('username', emailOrUsername.toLowerCase())
-            .single()
+          const lookupRes = await fetch('/api/auth/lookup-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: emailOrUsername.toLowerCase() })
+          })
           
-          if (!userRecord) {
+          if (!lookupRes.ok) {
             setError('Username or email not found')
             setLoading(false)
             return
           }
-          signInEmail = userRecord.email
+          
+          const { email } = await lookupRes.json()
+          signInEmail = email
         }
 
         const { data, error: err } = await supabase.auth.signInWithPassword({
