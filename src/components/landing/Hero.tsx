@@ -42,6 +42,9 @@ export default function Hero({ onOpenAuth, isUserLoggedIn, userTier }: HeroProps
   const [liveProfit, setLiveProfit] = useState(4.25);
   const [currentMatch, setCurrentMatch] = useState<Opportunity | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  
+  // Also check localStorage directly as fallback
+  const isActuallyLoggedIn = isUserLoggedIn || !!localStorage.getItem('auth_user');
 
   // Convert API matches to Opportunity format
   useEffect(() => {
@@ -126,26 +129,28 @@ export default function Hero({ onOpenAuth, isUserLoggedIn, userTier }: HeroProps
               The mathematical way to beat the bookmakers. Calculated edge on every position, regardless of the outcome.
             </p>
 
-            <div className={`flex flex-col sm:flex-row gap-4 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
-              <Link href="/login">
-                <button
-                  className="group px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
-                  data-testid="button-start-free-trial"
-                >
-                  Start Free Trial
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </Link>
+            {!isActuallyLoggedIn && (
+              <div className={`flex flex-col sm:flex-row gap-4 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: '0.4s' }}>
+                <Link href="/login">
+                  <button
+                    className="group px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                    data-testid="button-start-free-trial"
+                  >
+                    Start Free Trial
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </Link>
 
-              <Link href="/login">
-                <button
-                  className="px-8 py-4 bg-transparent border-2 border-white/10 hover:border-orange-500/50 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
-                  data-testid="button-create-account"
-                >
-                  Create Account
-                </button>
-              </Link>
-            </div>
+                <Link href="/login">
+                  <button
+                    className="px-8 py-4 bg-transparent border-2 border-white/10 hover:border-orange-500/50 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                    data-testid="button-create-account"
+                  >
+                    Create Account
+                  </button>
+                </Link>
+              </div>
+            )}
 
             <div className="flex items-center gap-8 pt-4">
               <div>
