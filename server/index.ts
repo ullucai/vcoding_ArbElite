@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { fetchArbitrageOpportunities } from './oddsApi';
+import apiRoutes from './routes.js';
 
 const app = express();
 // Use environment port or default to 5000
@@ -12,6 +13,9 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Attach API routes from routes.ts
+app.use('/api', apiRoutes);
 
 // --- API ROUTES ---
 
