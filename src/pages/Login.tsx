@@ -19,21 +19,21 @@ export default function Login() {
     setError('')
 
     try {
-      // Check if username already exists
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('username')
-        .eq('username', username.toLowerCase())
-        .single()
-      
-      if (existingUser) {
-        setError('This username is already taken')
-        setLoading(false)
-        return
-      }
+      if (isSignUp) {
+        // Check if username already exists
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('username')
+          .eq('username', username.toLowerCase())
+          .single()
+        
+        if (existingUser) {
+          setError('This username is already taken')
+          setLoading(false)
+          return
+        }
 
-      // Sign up via backend endpoint (email verification bypass for testing)
-      try {
+        // Sign up via backend endpoint (email verification bypass for testing)
         const signupRes = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -63,12 +63,6 @@ export default function Login() {
           }))
           setLocation('/dashboard')
         }
-      } catch (err) {
-        console.error('Signup error:', err)
-        setError('Signup failed - please try again')
-        setLoading(false)
-        return
-      }
       } else {
         // Sign in with email or username
         let signInEmail = emailOrUsername
