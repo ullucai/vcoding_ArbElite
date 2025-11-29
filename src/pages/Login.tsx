@@ -95,12 +95,29 @@ export default function Login() {
         }
 
         if (data.user) {
-          // Get user profile
-          const { data: userProfile } = await supabase
-            .from('users')
-            .select('username, tier')
-            .eq('id', data.user.id)
-            .single()
+          // Sync profile with backend (creates if missing)
+          const syncRes = await fetch('/api/auth/sync-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: data.user.id,
+              email: data.user.email
+            })
+          })
+
+          let userProfile: any = null
+          if (syncRes.ok) {
+            const syncData = await syncRes.json()
+            userProfile = syncData.user
+          } else {
+            // Fallback: try to get profile directly
+            const { data: profile } = await supabase
+              .from('users')
+              .select('username, tier')
+              .eq('id', data.user.id)
+              .single()
+            userProfile = profile
+          }
 
           localStorage.setItem('auth_user', JSON.stringify({
             id: data.user.id,
