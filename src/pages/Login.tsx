@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useLocation } from 'wouter'
 import { supabase } from '../lib/supabase'
+import { Link } from 'wouter'
 
 export default function Login() {
   const [, setLocation] = useLocation()
-  const [email, setEmail] = useState('')
+  const [emailOrUsername, setEmailOrUsername] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
@@ -80,9 +82,27 @@ export default function Login() {
           setLocation('/dashboard')
         }
       } else {
-        // Sign in
+        // Sign in with email or username
+        let signInEmail = emailOrUsername
+        
+        // If input doesn't contain @, treat as username and look up email
+        if (!emailOrUsername.includes('@')) {
+          const { data: userRecord } = await supabase
+            .from('users')
+            .select('email')
+            .eq('username', emailOrUsername.toLowerCase())
+            .single()
+          
+          if (!userRecord) {
+            setError('Username or email not found')
+            setLoading(false)
+            return
+          }
+          signInEmail = userRecord.email
+        }
+
         const { data, error: err } = await supabase.auth.signInWithPassword({
-          email,
+          email: signInEmail,
           password,
         })
 
@@ -128,32 +148,47 @@ export default function Login() {
           <p className="text-neutral-400 text-sm mb-6">Start your arbitrage journey</p>
           
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm text-neutral-400 mb-2">Email</label>
-              <input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-orange-500/50 transition"
-                data-testid="input-email"
-              />
-            </div>
+            {isSignUp ? (
+              <>
+                <div>
+                  <label className="block text-sm text-neutral-400 mb-2">Email</label>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-orange-500/50 transition"
+                    data-testid="input-email"
+                  />
+                </div>
 
-            {isSignUp && (
+                <div>
+                  <label className="block text-sm text-neutral-400 mb-2">Username</label>
+                  <input
+                    type="text"
+                    placeholder="your_username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '_'))}
+                    required
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-orange-500/50 transition"
+                    data-testid="input-username"
+                  />
+                  <p className="text-xs text-neutral-500 mt-1">Letters, numbers and underscore only</p>
+                </div>
+              </>
+            ) : (
               <div>
-                <label className="block text-sm text-neutral-400 mb-2">Username</label>
+                <label className="block text-sm text-neutral-400 mb-2">Email or Username</label>
                 <input
                   type="text"
-                  placeholder="your_username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '_'))}
-                  required={isSignUp}
+                  placeholder="your@email.com or username"
+                  value={emailOrUsername}
+                  onChange={(e) => setEmailOrUsername(e.target.value)}
+                  required
                   className="w-full px-4 py-2.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-orange-500/50 transition"
-                  data-testid="input-username"
+                  data-testid="input-email-or-username"
                 />
-                <p className="text-xs text-neutral-500 mt-1">Letters, numbers and underscore only</p>
               </div>
             )}
 
@@ -180,11 +215,23 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95"
+              className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg disabled:opacity-50 transition-all duration-200"
               data-testid="button-submit"
             >
               {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
             </button>
+
+            {!isSignUp && (
+              <Link href="/forgot-password">
+                <button
+                  type="button"
+                  className="w-full text-sm text-orange-400 hover:text-orange-300 transition"
+                  data-testid="button-forgot-password"
+                >
+                  Forgot password?
+                </button>
+              </Link>
+            )}
             
             <button
               type="button"
@@ -193,6 +240,8 @@ export default function Login() {
                 setIsSignUp(!isSignUp)
                 setError('')
                 setUsername('')
+                setEmail('')
+                setEmailOrUsername('')
               }}
               className="w-full text-sm text-orange-400 hover:text-orange-300 transition"
               data-testid="button-toggle-auth"
