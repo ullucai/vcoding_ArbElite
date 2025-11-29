@@ -9,7 +9,7 @@ const router = express.Router()
 // In-memory token storage (for demo - use Redis in production)
 const resetTokens: Record<string, { userId: string; email: string; expires: number }> = {}
 
-// Sign up endpoint (email verification bypass for testing)
+// Sign up endpoint - works with or without service role key
 router.post('/auth/signup', async (req, res) => {
   try {
     const { email, password, username } = req.body
@@ -20,38 +20,61 @@ router.post('/auth/signup', async (req, res) => {
 
     const supabaseUrl = process.env.VITE_SUPABASE_URL || ''
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || ''
 
-    if (!supabaseServiceKey) {
-      console.warn('[API] No SUPABASE_SERVICE_ROLE_KEY - email verification may be required')
-      return res.status(500).json({ error: 'Server configuration incomplete' })
+    let authData: any = null
+    let authError: any = null
+
+    if (supabaseServiceKey) {
+      // WITH service role - bypass email verification
+      console.log('[API] Using admin auth to bypass email verification')
+      const admin = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: { persistSession: false }
+      })
+
+      const result = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,  // Bypass email verification
+        user_metadata: {
+          username: username.toLowerCase()
+        }
+      })
+      authData = result.data
+      authError = result.error
+    } else {
+      // WITHOUT service role - use regular signup (email verification required)
+      console.log('[API] Using regular auth - email verification may be required')
+      const client = createClient(supabaseUrl, supabaseAnonKey)
+      
+      const result = await client.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: username.toLowerCase()
+          }
+        }
+      })
+      authData = result.data
+      authError = result.error
     }
-
-    // Admin client - bypass email verification
-    const admin = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { persistSession: false }
-    })
-
-    // 1. Create auth user with email verified
-    const { data: authData, error: authError } = await admin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,  // Bypass email verification
-      user_metadata: {
-        username: username.toLowerCase()
-      }
-    })
 
     if (authError) {
       console.error('[API] Auth user creation error:', authError)
       return res.status(400).json({ error: authError.message })
     }
 
-    if (!authData.user) {
+    if (!authData?.user) {
       return res.status(400).json({ error: 'User creation failed' })
     }
 
-    // 2. Create user profile in users table
-    const { error: profileError } = await admin
+    // Create user profile in users table (use service role if available)
+    const profileClient = supabaseServiceKey 
+      ? createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } })
+      : createClient(supabaseUrl, supabaseAnonKey)
+
+    const { error: profileError } = await profileClient
       .from('users')
       .insert({
         id: authData.user.id,
@@ -74,7 +97,7 @@ router.post('/auth/signup', async (req, res) => {
     })
   } catch (error) {
     console.error('[API] Signup error:', error)
-    res.status(500).json({ error: 'Signup failed' })
+    res.status(500).json({ error: 'Signup failed: ' + String(error).substring(0, 100) })
   }
 })
 
