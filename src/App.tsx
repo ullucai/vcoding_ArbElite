@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Route, Switch, useLocation } from 'wouter';
 import Navbar from './components/layout/Navbar';
 import Hero from './components/landing/Hero';
 import Features from './components/landing/Features';
 import Footer from './components/landing/Footer';
 import DashboardContainer from './pages/DashboardContainer';
-import LoginModal from './components/auth/LoginModal';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
@@ -32,14 +31,13 @@ function HomePage({ onOpenAuth, onNavigate, isUserLoggedIn, userTier, username }
 }
 
 function App() {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [userTier, setUserTier] = useState<UserTier>('free');
   const [username, setUsername] = useState('');
   const [location, navigate] = useLocation();
 
-  // Initialize auth state from localStorage on mount and location changes
-  useEffect(() => {
+  // Update auth state from localStorage
+  const updateAuthState = useCallback(() => {
     const authUser = localStorage.getItem('auth_user');
     if (authUser) {
       try {
@@ -49,16 +47,29 @@ function App() {
         setUsername(user.username || '');
       } catch (e) {
         console.error('Failed to parse auth user from localStorage');
+        setIsUserLoggedIn(false);
       }
+    } else {
+      setIsUserLoggedIn(false);
     }
   }, []);
+
+  // Initialize auth state on mount
+  useEffect(() => {
+    updateAuthState();
+  }, [updateAuthState]);
+
+  // Check auth state whenever location changes (e.g., after login)
+  useEffect(() => {
+    updateAuthState();
+  }, [location, updateAuthState]);
 
   // Redirect to dashboard when logged in and on login page
   useEffect(() => {
     if (isUserLoggedIn && location === '/login') {
       navigate('/dashboard');
     }
-  }, [isUserLoggedIn, location]);
+  }, [isUserLoggedIn, location, navigate]);
 
   const handleNavigate = (page: string) => {
     const pageMap: Record<string, string> = {
@@ -82,8 +93,8 @@ function App() {
         <Route path="/">
           {() => (
             <>
-              <Navbar onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
-              <HomePage onOpenAuth={() => setIsAuthModalOpen(true)} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
+              <Navbar isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
+              <HomePage onOpenAuth={() => {}} onNavigate={handleNavigate} isUserLoggedIn={isUserLoggedIn} userTier={userTier} username={username} />
             </>
           )}
         </Route>
