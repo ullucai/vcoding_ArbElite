@@ -7,6 +7,8 @@ import Footer from './components/landing/Footer';
 import DashboardContainer from './pages/DashboardContainer';
 import LoginModal from './components/auth/LoginModal';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Pricing from './pages/Pricing';
 import FeaturesPage from './pages/FeaturesPage';
 import AboutPage from './pages/AboutPage';
@@ -66,6 +68,14 @@ function App() {
 
         <Route path="/login">
           {() => <Login />}
+        </Route>
+
+        <Route path="/forgot-password">
+          {() => <ForgotPassword />}
+        </Route>
+
+        <Route path="/reset-password">
+          {() => <ResetPassword />}
         </Route>
 
         <Route path="/dashboard">
