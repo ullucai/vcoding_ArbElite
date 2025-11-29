@@ -19,70 +19,56 @@ export default function Login() {
     setError('')
 
     try {
-      if (isSignUp) {
-        // Check if username already exists
-        const { data: existingUser } = await supabase
-          .from('users')
-          .select('username')
-          .eq('username', username.toLowerCase())
-          .single()
-        
-        if (existingUser) {
-          setError('This username is already taken')
-          setLoading(false)
-          return
-        }
+      // Check if username already exists
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', username.toLowerCase())
+        .single()
+      
+      if (existingUser) {
+        setError('This username is already taken')
+        setLoading(false)
+        return
+      }
 
-        // Sign up with Supabase
-        const { data, error: err } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin + '/dashboard',
-            data: {
-              username: username,
-              tier: 'free'
-            }
-          }
+      // Sign up via backend endpoint (email verification bypass for testing)
+      try {
+        const signupRes = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            password,
+            username: username.toLowerCase()
+          })
         })
 
-        if (err) {
-          setError(err.message)
+        if (!signupRes.ok) {
+          const errData = await signupRes.json()
+          setError(errData.error || 'Signup failed')
           setLoading(false)
           return
         }
 
-        if (data.user) {
-          // Try to create user profile via backend (bypasses RLS)
-          try {
-            const createUserRes = await fetch('/api/create-user', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: data.user.id,
-                email: data.user.email,
-                username: username.toLowerCase(),
-                tier: 'free'
-              })
-            })
+        const { user } = await signupRes.json()
 
-            // Even if create-user fails, continue with signup
-            if (!createUserRes.ok) {
-              console.warn('Profile creation skipped, but auth succeeded')
-            }
-          } catch (profileErr) {
-            console.warn('Profile creation error (non-critical):', profileErr)
-          }
-
+        if (user) {
           // Auto-login by storing session
           localStorage.setItem('auth_user', JSON.stringify({
-            id: data.user.id,
-            email: data.user.email,
-            username: username.toLowerCase(),
+            id: user.id,
+            email: user.email,
+            username: user.username,
             tier: 'free'
           }))
           setLocation('/dashboard')
         }
+      } catch (err) {
+        console.error('Signup error:', err)
+        setError('Signup failed - please try again')
+        setLoading(false)
+        return
+      }
       } else {
         // Sign in with email or username
         let signInEmail = emailOrUsername
