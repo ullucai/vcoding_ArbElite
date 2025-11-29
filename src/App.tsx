@@ -114,14 +114,15 @@ function App() {
         <Route path="/dashboard">
           {() => {
             if (!isUserLoggedIn) {
-              setTimeout(() => setIsAuthModalOpen(true), 0);
-              navigate('/');
+              navigate('/login');
               return null;
             }
             return (
               <DashboardContainer
                 userTier={userTier}
+                username={username}
                 onLogout={() => {
+                  localStorage.removeItem('auth_user');
                   setIsUserLoggedIn(false);
                   setUserTier('free');
                   setUsername('');
